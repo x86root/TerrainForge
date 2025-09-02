@@ -1,0 +1,33 @@
+// Tree placement using noise-based clustering
+		FastNoiseLite treeNoise;
+		treeNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin); // Smooth variation
+		treeNoise.SetFrequency(0.1f); // Controls cluster size
+
+    for (int x = 0; x < terrain.height - 1; ++x) {
+        for (int y = 0; y < terrain.width - 1; ++y) {
+            float h = terrain.heightMap[x][y];
+
+            // Only place trees on grassy terrain
+            if (h > 20.0f && h < 35.0f) {
+                float treeChance = treeNoise.GetNoise((float)x, (float)y); // Range ~[-1, 1]
+                if (treeChance > 0.4f) {
+                    float worldX = x - terrain.width / 2.0f;
+                    float worldZ = y - terrain.height / 2.0f;
+
+                    // Tree trunk
+                    glColor3f(0.4f, 0.2f, 0.1f);
+                    glBegin(GL_LINES);
+                    glVertex3f(worldX, h, worldZ);
+                    glVertex3f(worldX, h + 2.0f, worldZ);
+                    glEnd();
+
+                    // Tree canopy
+                    glColor3f(0.1f, 0.6f, 0.1f);
+                    glPointSize(4.0f);
+                    glBegin(GL_POINTS);
+                    glVertex3f(worldX, h + 2.5f, worldZ);
+                    glEnd();
+                }
+            }
+        }
+    }
